@@ -1,6 +1,10 @@
-﻿namespace TabloidMVC.Repositories
+﻿using System.Collections.Generic;
+using TabloidMVC.Models;
+
+namespace TabloidMVC.Repositories
 {
-    public class ICommentRepository
+    public interface ICommentRepository
     {
+        Post GetUserCommentById(int id);
     }
 }
