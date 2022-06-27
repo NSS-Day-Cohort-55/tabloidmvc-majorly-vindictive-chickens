@@ -25,22 +25,18 @@ namespace TabloidMVC.Controllers
             var userProfiles = _userProfileRepository.GetAllUserProfiles();
             return View(userProfiles);
         }
-        /*
+        
         public IActionResult Details(int id)
         {
-            var post = _userProfileRepository.GetPublishedPostById(id);
-            if (post == null)
+            var userProfile = _userProfileRepository.GetUserProfileById(id);
+            if (userProfile == null)
             {
-                int userId = GetCurrentUserProfileId();
-                post = _userProfileRepository.GetUserPostById(id, userId);
-                if (post == null)
-                {
-                    return NotFound();
-                }
+                return NotFound();
             }
-            return View(post);
+            return View(userProfile);
         }
 
+        /*
         public IActionResult Create()
         {
             var vm = new PostCreateViewModel();
