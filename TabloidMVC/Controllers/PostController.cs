@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 using System.Security.Claims;
+using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
 
@@ -60,11 +61,39 @@ namespace TabloidMVC.Controllers
                 _postRepository.Add(vm.Post);
 
                 return RedirectToAction("Details", new { id = vm.Post.Id });
-            } 
+            }
             catch
             {
                 vm.CategoryOptions = _categoryRepository.GetAll();
                 return View(vm);
+            }
+        }
+        public IActionResult Delete(int id)
+        {
+
+            Post post = _postRepository.GetUserPostById(id, GetCurrentUserProfileId());
+            if (post.UserProfileId == GetCurrentUserProfileId())
+            {
+                return View(post);
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Delete(Post post)
+        {
+            try
+            {
+                _postRepository.Delete(post);
+
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return RedirectToAction("Details", new { id = post.Id });
             }
         }
 
