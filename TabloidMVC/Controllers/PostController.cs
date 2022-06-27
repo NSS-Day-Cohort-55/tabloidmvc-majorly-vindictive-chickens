@@ -121,7 +121,7 @@ namespace TabloidMVC.Controllers
             }
             catch
             {
-                vm.CategoryOptions = _categoryRepository.GetAll();
+                vm.TagOptions = _tagRepository.GetAllTags();
                 return View(vm);
             }
         }

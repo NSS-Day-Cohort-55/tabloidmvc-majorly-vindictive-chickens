@@ -22,8 +22,8 @@
                 <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Delete">
                     <i class="fas fa-trash"></i>
                 </a>
-                <a asp-action="InsertTag" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Add Tag">
-                    <i class="fas fa-trash"></i>
+                <a asp-controller="Comment" asp-action="Index" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="View Comment" >
+                    <i class="fas fa-comment"></i>
                 </a>
             </div>
         </section>
