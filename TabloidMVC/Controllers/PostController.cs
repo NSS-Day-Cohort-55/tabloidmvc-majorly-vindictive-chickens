@@ -6,6 +6,7 @@ using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
+using System.Collections.Generic;
 
 namespace TabloidMVC.Controllers
 {
@@ -99,10 +100,16 @@ namespace TabloidMVC.Controllers
             }
         }
 
-        public IActionResult CreatePostTag()
+        public IActionResult CreatePostTag(int id)
         {
-            var vm = new PostTagViewModel();
-            vm.TagOptions = _tagRepository.GetAllTags();
+            var tags = _tagRepository.GetAllTags();
+            var post = _postRepository.GetPublishedPostById(id);
+            var vm = new PostTagViewModel()
+            {
+                TagOptions = tags,
+                Post = post,
+                TagIds = new List<int>()
+            };
             return View(vm);
         }
 
@@ -111,18 +118,20 @@ namespace TabloidMVC.Controllers
         {
             try
             {
-                vm.Post.CreateDateTime = DateAndTime.Now;
-                vm.Post.IsApproved = true;
-                vm.Post.UserProfileId = GetCurrentUserProfileId();
 
-                _postRepository.Add(vm.Post);
+
+                foreach (int tagId in vm.TagIds)
+                {
+                    
+                    
+                    _postRepository.InsertTag(vm.Post, tagId);
+                }
 
                 return RedirectToAction("Details", new { id = vm.Post.Id });
             }
             catch
             {
-                vm.TagOptions = _tagRepository.GetAllTags();
-                return View(vm);
+                return View();
             }
         }
 

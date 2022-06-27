@@ -213,7 +213,7 @@ namespace TabloidMVC.Repositories
             };
         }
 
-        public void InsertTag(Post post, Tag tag)
+        public void InsertTag(Post post, int tagId)
         {
             using (SqlConnection conn = Connection)
             {
@@ -224,7 +224,7 @@ namespace TabloidMVC.Repositories
                                         OUTPUT INSERTED.Id
                                         VALUES (@postId, @tagId)";
                     cmd.Parameters.AddWithValue("@postId", post.Id);
-                    cmd.Parameters.AddWithValue("@tagId", tag.Id);
+                    cmd.Parameters.AddWithValue("@tagId", tagId);
                     int id = (int)cmd.ExecuteScalar();
 
                     post.Id = id;
