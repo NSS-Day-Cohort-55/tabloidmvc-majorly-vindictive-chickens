@@ -5,6 +5,6 @@ namespace TabloidMVC.Repositories
 {
     public interface ICommentRepository
     {
-        Post GetUserCommentById(int id);
+        List<Comment> GetCommentByPostId(int id);
     }
 }
