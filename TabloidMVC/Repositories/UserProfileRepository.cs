@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using TabloidMVC.Models;
 using TabloidMVC.Utils;
 
@@ -50,6 +51,42 @@ namespace TabloidMVC.Repositories
                     reader.Close();
 
                     return userProfile;
+                }
+            }
+        }
+        public List<UserProfile> GetAllUserProfiles()
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                       SELECT up.Id, up.FirstName, up.LastName, up.DisplayName, up.UserTypeId, 
+                              ut.Name AS UserType
+                         FROM UserProfile up
+                              LEFT JOIN UserType ut ON ut.Id = up.UserTypeId
+                         ORDER BY up.DisplayName";
+               
+                    var reader = cmd.ExecuteReader();
+
+                    var userprofiles = new List<UserProfile>();
+
+                    while (reader.Read())
+                    {
+                        UserProfile userProfile = new UserProfile
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
+                            UserTypeId = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
+
+                            UserType = new UserType { Name = reader.GetString(reader.GetOrdinal("UserType")) }
+                        };
+                        userprofiles.Add(userProfile);
+                    }
+                    return userprofiles;
                 }
             }
         }
