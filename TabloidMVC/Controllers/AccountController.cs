@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using TabloidMVC.Models;
 using TabloidMVC.Repositories;
+using System;
 
 namespace TabloidMVC.Controllers
 {
@@ -38,6 +39,54 @@ namespace TabloidMVC.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, userProfile.Id.ToString()),
                 new Claim(ClaimTypes.Email, userProfile.Email),
+            };
+
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        // GET: Account/Create
+        public ActionResult Create()
+        {
+            UserProfile up = new UserProfile();
+
+            return View(up);
+        }
+
+        // POST: Account/Create
+        [HttpPost]
+        public async Task<IActionResult> Create(UserProfile newUserProfile)
+        {
+            var userProfile = _userProfileRepository.GetByEmail(newUserProfile.Email);
+
+            if (userProfile != null)
+            {
+                ModelState.AddModelError("Email", "User already exists");
+                return View();
+            }
+
+            UserType userType = new UserType
+            {
+                Id = 2,
+                Name = "Author"
+            };
+
+            newUserProfile.UserType = userType;
+            newUserProfile.UserTypeId = 2;
+            newUserProfile.CreateDateTime = DateTime.Now;
+
+            _userProfileRepository.Register(newUserProfile);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, newUserProfile.Id.ToString()),
+                new Claim(ClaimTypes.Email, newUserProfile.Email),
             };
 
             var claimsIdentity = new ClaimsIdentity(
