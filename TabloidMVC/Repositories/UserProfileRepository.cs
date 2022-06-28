@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TabloidMVC.Models;
 using TabloidMVC.Utils;
+using System;
 
 namespace TabloidMVC.Repositories
 {
@@ -177,7 +178,8 @@ namespace TabloidMVC.Repositories
                                 LastName = @lastName,
                                 DisplayName = @displayName,
                                 Email = @email, 
-                                UserTypeId = @userTypeId
+                                UserTypeId = @userTypeId, 
+                                ImageLocation = @imageLocation
                             WHERE Id = @id";
 
                     cmd.Parameters.AddWithValue("@firstName", userProfile.FirstName);
@@ -186,6 +188,8 @@ namespace TabloidMVC.Repositories
                     cmd.Parameters.AddWithValue("@email", userProfile.Email);
                     cmd.Parameters.AddWithValue("@userTypeId", userProfile.UserTypeId);
                     cmd.Parameters.AddWithValue("@id", userProfile.Id);
+
+                    cmd.Parameters.AddWithValue("@imageLocation", !String.IsNullOrEmpty(userProfile.ImageLocation) ? (object)userProfile.ImageLocation : DBNull.Value);
 
                     cmd.ExecuteNonQuery();
                 }

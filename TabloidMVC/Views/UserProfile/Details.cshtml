@@ -9,7 +9,19 @@
 <div>
     <h4>UserProfile</h4>
     <hr />
-    <dl class="row">
+    @if (String.IsNullOrEmpty(Model.ImageLocation))
+        {
+            <img
+            src="https://media.istockphoto.com/vectors/user-icon-flat-isolated-on-white-background-user-symbol-vector-vector-id1300845620?s=612x612"
+            class="card-img-top"
+            alt="Default"
+            style="height:50px;width:100px;"
+            />
+        } else 
+        {
+            <img src="@Url.Content(Model.ImageLocation)" class="card-img-top" alt="Avatar" style="height:50px;width:100px;"/>
+        }
+    <dl class="row">       
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.FullName)
         </dt>
