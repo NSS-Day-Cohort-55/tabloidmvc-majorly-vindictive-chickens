@@ -114,7 +114,7 @@ namespace TabloidMVC.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreatePostTag(PostTagViewModel vm)
+        public IActionResult CreatePostTag(PostTagViewModel vm, int id)
         {
             try
             {
@@ -124,10 +124,10 @@ namespace TabloidMVC.Controllers
                 {
                     
                     
-                    _postRepository.InsertTag(vm.Post, tagId);
+                    _postRepository.InsertTag(id, tagId);
                 }
 
-                return RedirectToAction("Details", new { id = vm.Post.Id });
+                return RedirectToAction("Details", "Post", new { id = id });
             }
             catch
             {
