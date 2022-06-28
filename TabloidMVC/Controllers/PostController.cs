@@ -29,6 +29,11 @@ namespace TabloidMVC.Controllers
             var posts = _postRepository.GetAllPublishedPosts();
             return View(posts);
         }
+        public IActionResult UserPosts()
+        {
+            var posts = _postRepository.GetAllPostsByUser(GetCurrentUserProfileId());
+            return View(posts);
+        }
 
         public IActionResult Details(int id)
         {
@@ -47,13 +52,13 @@ namespace TabloidMVC.Controllers
 
         public IActionResult Create()
         {
-            var vm = new PostCreateViewModel();
+            var vm = new PostFormViewModel();
             vm.CategoryOptions = _categoryRepository.GetAll();
             return View(vm);
         }
 
         [HttpPost]
-        public IActionResult Create(PostCreateViewModel vm)
+        public IActionResult Create(PostFormViewModel vm)
         {
             try
             {
@@ -62,6 +67,35 @@ namespace TabloidMVC.Controllers
                 vm.Post.UserProfileId = GetCurrentUserProfileId();
 
                 _postRepository.Add(vm.Post);
+
+                return RedirectToAction("Details", new { id = vm.Post.Id });
+            }
+            catch
+            {
+                vm.CategoryOptions = _categoryRepository.GetAll();
+                return View(vm);
+            }
+        }
+        public IActionResult Edit(int id)
+        {
+            var vm = new PostFormViewModel
+            {
+                CategoryOptions = _categoryRepository.GetAll(),
+                Post = _postRepository.GetPostByPostId(id)
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(PostFormViewModel vm)
+        {
+            try
+            {
+                vm.Post.CreateDateTime = DateAndTime.Now;
+                vm.Post.IsApproved = true;
+                vm.Post.UserProfileId = GetCurrentUserProfileId();
+
+                _postRepository.Update(vm.Post);
 
                 return RedirectToAction("Details", new { id = vm.Post.Id });
             }
