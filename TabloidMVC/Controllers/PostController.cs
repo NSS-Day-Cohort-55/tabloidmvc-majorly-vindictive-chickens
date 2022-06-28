@@ -228,6 +228,43 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        public ActionResult DeletePostTags(int id)
+        {
+            var tags = _tagRepository.GetAllTags();
+            var post = _postRepository.GetPublishedPostById(id);
+            var vm = new PostTagViewModel()
+            {
+                TagOptions = tags,
+                Post = post,
+                PostTags = _postRepository.GetTagsByPost(id)
+            };
+            return View(vm);
+        }
+
+        // POST: OwnersController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeletePostTags(PostTagViewModel vm, int id)
+        {
+            try
+            {
+
+
+                foreach (int tagId in vm.TagIds)
+                {
+
+
+                    _postRepository.DeleteTag(id, tagId);
+                }
+
+                return RedirectToAction("Details", "Post", new { id = id });
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
