@@ -15,7 +15,7 @@ namespace TabloidMVC.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT c.Subject, c.Content,         c.CreateDateTime  
+                    cmd.CommandText = @"SELECT c.Subject, c.Content, c.PostId, c.CreateDateTime  
                     FROM Comment c 
                     LEFT JOIN UserProfile u ON c.UserProfileId = u.id 
                     Where c.PostId = @postId";
@@ -40,6 +40,28 @@ namespace TabloidMVC.Repositories
 
                     reader.Close();
                     return comments;
+                }
+            }
+        }
+
+        public void Add(Comment comment)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                                        INSERT INTO Comment
+                                        (PostId, UserProfileId, Subject, Content, CreateDateTime)
+                                        OUTPUT INSERTED.ID
+                                        VALUES (@PostId, @UserProfileId, @Subject, @Content, SysDateTime())";
+                    cmd.Parameters.AddWithValue("@PostId", comment.PostId);
+                    cmd.Parameters.AddWithValue("@UserProfileId", comment.UserProfileId);
+                    cmd.Parameters.AddWithValue("@Subject", comment.Subject );
+                    cmd.Parameters.AddWithValue("@Content", comment.Content);
+
+                    comment.Id = (int)cmd.ExecuteScalar();
                 }
             }
         }

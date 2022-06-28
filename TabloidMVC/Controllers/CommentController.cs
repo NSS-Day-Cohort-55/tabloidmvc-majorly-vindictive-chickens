@@ -6,7 +6,7 @@ using System.Security.Claims;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
 using System;
-
+using TabloidMVC.Models;
 
 namespace TabloidMVC.Controllers
 {
@@ -32,6 +32,30 @@ namespace TabloidMVC.Controllers
             {
                 var post = _postRepository.GetPublishedPostById(id);
                 return View(post);
+            }
+        }
+
+        public IActionResult Create(int id)
+        {
+            var vm = new CommentCreateViewModel();
+            return View(vm);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Create(CommentCreateViewModel vm, int id)
+        {
+            try
+            {
+                vm.Comment.PostId = id;
+                vm.Comment.UserProfileId = GetCurrentUserProfileId();
+                _commentRepository.Add(vm.Comment);
+                return RedirectToAction("Index", new {id});
+
+            }
+            catch (Exception ex)
+            {
+                return View(vm);
             }
         }
 
