@@ -318,5 +318,71 @@ namespace TabloidMVC.Repositories
                 }
             };
         }
+
+        public void InsertTag(int postId, int tagId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO PostTag (PostId, TagId)
+                                        VALUES (@postId, @tagId)";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    cmd.Parameters.AddWithValue("@tagId", tagId);
+                    cmd.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+        }
+
+        public void DeleteTag(int postId, int tagId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM PostTag
+                                        Where PostId = @postId AND
+                                        TagId = @tagId";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    cmd.Parameters.AddWithValue("@tagId", tagId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public List<Tag> GetTagsByPost(int postId)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT t.Id, t.Name
+                                          FROM PostTag p 
+                                               JOIN Tag t on p.TagId = t.Id 
+                                         WHERE p.PostId = @postId";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    var reader = cmd.ExecuteReader();
+
+                    List<Tag> tags = new List<Tag>();
+                    while (reader.Read())
+                    {
+                        Tag tag = new Tag()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                        };
+                        tags.Add(tag);
+                    }
+
+                    reader.Close();
+
+                    return tags;
+                }
+            }
+        }
     }
 }

@@ -13,6 +13,8 @@ namespace TabloidMVC.Repositories
         Post GetPublishedPostById(int id);
         Post GetPostByPostId(int id);
         Post GetUserPostById(int id, int userProfileId);
-
+        void InsertTag(int postId, int tagId);
+        void DeleteTag(int postId, int tagId);
+        public List<Tag> GetTagsByPost(int postId);
     }
 }
