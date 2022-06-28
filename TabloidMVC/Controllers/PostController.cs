@@ -6,6 +6,7 @@ using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
+using System.Collections.Generic;
 
 namespace TabloidMVC.Controllers
 {
@@ -14,11 +15,13 @@ namespace TabloidMVC.Controllers
     {
         private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ITagRepository _tagRepository;
 
-        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository)
+        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository, ITagRepository tagRepository)
         {
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
+            _tagRepository = tagRepository;
         }
 
         public IActionResult Index()
@@ -34,7 +37,11 @@ namespace TabloidMVC.Controllers
 
         public IActionResult Details(int id)
         {
+            var vm = new PostDetailViewModel();
             var post = _postRepository.GetPublishedPostById(id);
+            var tags = _postRepository.GetTagsByPost(id);
+            vm.Tags = tags;
+            vm.Post = post;
             if (post == null)
             {
                 int userId = GetCurrentUserProfileId();
@@ -44,7 +51,7 @@ namespace TabloidMVC.Controllers
                     return NotFound();
                 }
             }
-            return View(post);
+            return View(vm);
         }
 
         public IActionResult Create()
@@ -128,6 +135,41 @@ namespace TabloidMVC.Controllers
             catch
             {
                 return RedirectToAction("Details", new { id = post.Id });
+            }
+        }
+
+        public IActionResult CreatePostTag(int id)
+        {
+            var tags = _tagRepository.GetAllTags();
+            var post = _postRepository.GetPublishedPostById(id);
+            var vm = new PostTagViewModel()
+            {
+                TagOptions = tags,
+                Post = post,
+                TagIds = new List<int>()
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult CreatePostTag(PostTagViewModel vm, int id)
+        {
+            try
+            {
+
+
+                foreach (int tagId in vm.TagIds)
+                {
+                    
+                    
+                    _postRepository.InsertTag(id, tagId);
+                }
+
+                return RedirectToAction("Details", "Post", new { id = id });
+            }
+            catch
+            {
+                return View();
             }
         }
 
