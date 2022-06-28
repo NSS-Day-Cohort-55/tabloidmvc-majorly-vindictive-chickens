@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
+using System.Collections.Generic;
 using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
@@ -15,12 +16,14 @@ namespace TabloidMVC.Controllers
     {
         private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IUserProfileRepository _userProfileRepository;
         private readonly ITagRepository _tagRepository;
 
-        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository, ITagRepository tagRepository)
+        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository, IUserProfileRepository userProfileRepository, ITagRepository tagRepository)
         {
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
+            _userProfileRepository = userProfileRepository;
             _tagRepository = tagRepository;
         }
 
@@ -33,6 +36,58 @@ namespace TabloidMVC.Controllers
         {
             var posts = _postRepository.GetAllPostsByUser(GetCurrentUserProfileId());
             return View(posts);
+        }
+
+        public IActionResult PostsByUser()
+        {
+            var vm = new PostsByUserViewModel
+            {
+                UserProfiles = _userProfileRepository.GetAllUserProfiles(),
+                Posts = _postRepository.GetAllPublishedPosts()
+            };
+      
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult PostsByUser(PostsByUserViewModel vm)
+        {
+            vm.UserProfiles = _userProfileRepository.GetAllUserProfiles();
+            if (vm.SelectedProfileId == 0)
+            {
+                vm.Posts = _postRepository.GetAllPublishedPosts();
+            }
+            else
+            {
+                vm.Posts = _postRepository.GetAllPostsByUser(vm.SelectedProfileId);
+            }
+            return View(vm);
+        }
+
+        public IActionResult PostsByCategory()
+        {
+            var vm = new PostsByCategoryViewModel
+            {
+                Categories = _categoryRepository.GetAll(),
+                Posts = _postRepository.GetAllPublishedPosts()
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult PostsByCategory(PostsByCategoryViewModel vm)
+        {
+            vm.Categories = _categoryRepository.GetAll();
+            if (vm.SelectedCategoryId == 0)
+            {
+                vm.Posts = _postRepository.GetAllPublishedPosts();
+            }
+            else
+            {
+                vm.Posts = _postRepository.GetAllPostsByCategory(vm.SelectedCategoryId);
+            }
+            return View(vm);
         }
 
         public IActionResult Details(int id)
