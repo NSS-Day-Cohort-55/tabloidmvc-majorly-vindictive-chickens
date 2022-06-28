@@ -53,9 +53,11 @@ namespace TabloidMVC.Repositories
                 {
                     cmd.CommandText = @"
                                         INSERT INTO Comment
-                                        Subject, Content
+                                        PostId, UserProfileId, Subject, Content
                                         OUPUT INSERTED.ID
                                         VALUES (@Subject, @Content)";
+                    cmd.Parameters.AddWithValue("@PostId", comment.PostId);
+                    cmd.Parameters.AddWithValue("@UserProfileId", comment.UserProfileId);
                     cmd.Parameters.AddWithValue("@Subject", comment.Subject );
                     cmd.Parameters.AddWithValue("@Content", comment.Content);
 
