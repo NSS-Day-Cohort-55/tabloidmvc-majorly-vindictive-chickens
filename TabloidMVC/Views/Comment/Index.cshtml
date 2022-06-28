@@ -7,20 +7,20 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" asp-route-id="@Url.ActionContext.RouteData.Values["id"]">Create New</a>
 </p>
 <table class="table">
     <thead>
         <tr>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
+            </th>*@
+           @* <th>
                 @Html.DisplayNameFor(model => model.PostId)
-            </th>
-            <th>
+            </th>*@
+           @* <th>
                 @Html.DisplayNameFor(model => model.UserProfileId)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Subject)
             </th>
@@ -36,15 +36,15 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
+          @*  <td>
                 @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
+            </td>*@
+            @*<td>
                 @Html.DisplayFor(modelItem => item.PostId)
-            </td>
-            <td>
+            </td>*@
+            @*<td>
                 @Html.DisplayFor(modelItem => item.UserProfileId)
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.Subject)
             </td>

@@ -35,7 +35,7 @@ namespace TabloidMVC.Controllers
             }
         }
 
-        public IActionResult Create()
+        public IActionResult Create(int id)
         {
             var vm = new CommentCreateViewModel();
             return View(vm);
@@ -50,10 +50,10 @@ namespace TabloidMVC.Controllers
                 vm.Comment.PostId = id;
                 vm.Comment.UserProfileId = GetCurrentUserProfileId();
                 _commentRepository.Add(vm.Comment);
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new {id});
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return View(vm);
             }
