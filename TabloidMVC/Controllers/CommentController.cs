@@ -65,5 +65,7 @@ namespace TabloidMVC.Controllers
             return int.Parse(id);
         }
 
+
+
     }
 }
