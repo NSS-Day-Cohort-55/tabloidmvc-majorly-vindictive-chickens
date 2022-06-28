@@ -360,7 +360,7 @@ namespace TabloidMVC.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT t.Id, t.Name
+                    cmd.CommandText = @"SELECT DISTINCT t.Name, t.Id
                                           FROM PostTag p 
                                                JOIN Tag t on p.TagId = t.Id 
                                          WHERE p.PostId = @postId";
@@ -372,7 +372,6 @@ namespace TabloidMVC.Repositories
                     {
                         Tag tag = new Tag()
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                         };
                         tags.Add(tag);
