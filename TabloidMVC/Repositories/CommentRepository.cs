@@ -16,7 +16,7 @@ namespace TabloidMVC.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT c.Subject, c.Content, c.PostId, c.CreateDateTime  
+                    cmd.CommandText = @"SELECT c.Id, c.Subject, c.Content, c.PostId, c.CreateDateTime  
                     FROM Comment c 
                     LEFT JOIN UserProfile u ON c.UserProfileId = u.id 
                     Where c.PostId = @postId";
@@ -29,6 +29,7 @@ namespace TabloidMVC.Repositories
                     {
                         Comment comment = new Comment
                         {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             PostId = reader.GetInt32(reader.GetOrdinal("PostId")),
                             Subject = reader.GetString(reader.GetOrdinal("Subject")),
                             Content = reader.GetString(reader.GetOrdinal("Content")),
