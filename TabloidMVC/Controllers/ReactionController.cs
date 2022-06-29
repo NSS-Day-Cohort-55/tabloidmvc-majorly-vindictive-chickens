@@ -24,13 +24,21 @@ namespace TabloidMVC.Controllers
         // GET: ReactionController
         public ActionResult Index()
         {
-            return View();
+            var reactions = _reactionRepository.GetAllReactions();
+            return View(reactions);
         }
 
         // GET: ReactionController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            Reaction reaction = _reactionRepository.GetReaction(id);
+
+            if (reaction == null)
+            {
+                return NotFound();
+            }
+
+            return View(reaction);
         }
 
         // GET: ReactionController/Create
@@ -42,15 +50,16 @@ namespace TabloidMVC.Controllers
         // POST: ReactionController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Reaction reaction)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _reactionRepository.AddReaction(reaction);
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception)
             {
-                return View();
+                return View(reaction);
             }
         }
 
