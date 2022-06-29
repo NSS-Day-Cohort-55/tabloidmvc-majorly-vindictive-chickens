@@ -6,7 +6,6 @@ using System;
 using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
-using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
 
 namespace TabloidMVC.Controllers
@@ -101,7 +100,20 @@ namespace TabloidMVC.Controllers
             }
             else
             {
-                userProfile.IsDeactivated = true;
+                if ((userProfile.UserTypeId == 1 && userProfile.DeactivatorId != GetCurrentUserProfileId() 
+                     && userProfile.DeactivatorId != 0) ||
+                    userProfile.UserTypeId == 2)
+                {
+                    userProfile.DeactivatorId = GetCurrentUserProfileId();
+                    _userProfileRepository.UpdateUser(userProfile);
+                    userProfile.IsDeactivated = true;
+                }
+                else if (userProfile.UserTypeId == 1 && userProfile.DeactivatorId == 0)
+                {
+                    userProfile.DeactivatorId = GetCurrentUserProfileId();
+                    _userProfileRepository.UpdateUser(userProfile);
+                    return RedirectToAction("Index");
+                }
             }
 
             try
@@ -143,13 +155,13 @@ namespace TabloidMVC.Controllers
                 return View(vm);
             }
         }
+        */
 
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
         }
-        */
     }
 }
 

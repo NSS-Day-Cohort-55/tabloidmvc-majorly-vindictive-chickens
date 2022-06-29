@@ -1,0 +1,1 @@
+﻿ALTER TABLE UserProfile ADD DeactivatorId INT DEFAULT 0 NOT NULL;

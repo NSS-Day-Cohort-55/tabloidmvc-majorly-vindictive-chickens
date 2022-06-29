@@ -1,0 +1,1 @@
+﻿ALTER TABLE UserProfile add IsDeactivated BIT DEFAULT 0 NOT NULL;
