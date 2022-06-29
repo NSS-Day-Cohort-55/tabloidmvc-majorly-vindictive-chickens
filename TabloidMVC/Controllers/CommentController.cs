@@ -90,6 +90,42 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        public IActionResult Edit(int id)
+        {
+            Comment comment = _commentRepository.GetCommentById(id);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+            if(comment.UserProfileId == GetCurrentUserProfileId())
+            {
+                return View(comment);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Edit(int id, Comment comment)
+        {
+            try
+            {
+                _commentRepository.UpdateComment(comment);
+
+                return RedirectToAction("Index", "Comment", new { id = comment.PostId });
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index", "Comment", new { id = comment.PostId });
+            }
+        }
+
+
 
         private int GetCurrentUserProfileId()
         {
