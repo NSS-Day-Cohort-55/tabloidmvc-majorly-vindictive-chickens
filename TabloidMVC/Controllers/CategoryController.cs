@@ -26,5 +26,26 @@ namespace TabloidMVC.Controllers
             var categories = _categoryRepository.GetAll();
             return View(categories);
         }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Create(Category category)
+        {
+            try
+            {
+                _categoryRepository.AddCategory(category);
+                    return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(category);
+            }
+        }
     }
 }
