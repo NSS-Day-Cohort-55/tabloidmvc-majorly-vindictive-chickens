@@ -35,6 +35,13 @@ namespace TabloidMVC.Controllers
                 return View();
             }
 
+            // Prevent deactivated user from logging in
+            if (userProfile.IsDeactivated)
+            {
+                ModelState.AddModelError("Email", "User is deactivated");
+                return View();
+            }
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, userProfile.Id.ToString()),
@@ -105,6 +112,12 @@ namespace TabloidMVC.Controllers
         {
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        private int GetCurrentUserProfileId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
         }
     }
 }

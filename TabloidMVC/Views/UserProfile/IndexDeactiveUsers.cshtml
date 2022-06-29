@@ -1,18 +1,11 @@
 ﻿@model IEnumerable<TabloidMVC.Models.UserProfile>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "IndexDeactivateUsers";
 }
 
-<h1>Index</h1>
+<h1>Deactivated User Profiles</h1>
 
-<p>
-    <a asp-action="Create">Create New</a> 
-    @if (User.IsInRole("1"))
-    {
-        <a asp-action="IndexDeactiveUsers">| List Deactivated Users</a>
-    }
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -43,18 +36,8 @@
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
                 @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-                @if (User.IsInRole("1"))
-                {
-                        if (item.IsDeactivated)
-                        {
-                            @Html.ActionLink(" | Reactivate", "Deactivate", new { id = item.Id })
-                        }
-                        else
-                        {
-                            @Html.ActionLink(" | Deactivate", "Deactivate", new { id = item.Id })
-                        }
-                    }
+                @Html.ActionLink("Delete", "Delete", new { id=item.Id }) |
+                @Html.ActionLink("Reactivate", "Deactivate", new { id = item.Id })
             </td>
         </tr>
 }

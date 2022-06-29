@@ -10,5 +10,7 @@ namespace TabloidMVC.Repositories
         void Register(UserProfile newUserProfile);
         UserProfile GetUserProfileById(int userId);
         void UpdateUser(UserProfile userProfile);
+        void DeactivateUser(UserProfile userProfile);
+        List<UserProfile> GetAllDeactiveUserProfiles();
     }
 }

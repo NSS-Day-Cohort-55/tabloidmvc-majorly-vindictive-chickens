@@ -19,7 +19,7 @@ namespace TabloidMVC.Repositories
                 {
                     cmd.CommandText = @"
                        SELECT u.id, u.FirstName, u.LastName, u.DisplayName, u.Email,
-                              u.CreateDateTime, u.ImageLocation, u.UserTypeId,
+                              u.CreateDateTime, u.ImageLocation, u.UserTypeId, u.IsDeactivated,
                               ut.[Name] AS UserTypeName
                          FROM UserProfile u
                               LEFT JOIN UserType ut ON u.UserTypeId = ut.id
@@ -41,6 +41,7 @@ namespace TabloidMVC.Repositories
                             CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
                             ImageLocation = DbUtils.GetNullableString(reader, "ImageLocation"),
                             UserTypeId = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
+                            IsDeactivated = reader.GetBoolean(reader.GetOrdinal("IsDeactivated")),
                             UserType = new UserType()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
@@ -63,7 +64,7 @@ namespace TabloidMVC.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                       SELECT up.Id, up.FirstName, up.LastName, up.DisplayName, up.UserTypeId, 
+                       SELECT up.Id, up.FirstName, up.LastName, up.DisplayName, up.UserTypeId, up.IsDeactivated,
                               ut.Name AS UserType
                          FROM UserProfile up
                               LEFT JOIN UserType ut ON ut.Id = up.UserTypeId
@@ -82,6 +83,46 @@ namespace TabloidMVC.Repositories
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
                             UserTypeId = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
+                            IsDeactivated = reader.GetBoolean(reader.GetOrdinal("IsDeactivated")),
+
+                            UserType = new UserType { Name = reader.GetString(reader.GetOrdinal("UserType")) }
+                        };
+                        userprofiles.Add(userProfile);
+                    }
+                    return userprofiles;
+                }
+            }
+        }
+
+        public List<UserProfile> GetAllDeactiveUserProfiles()
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                       SELECT up.Id, up.FirstName, up.LastName, up.DisplayName, up.UserTypeId, up.IsDeactivated,
+                              ut.Name AS UserType
+                         FROM UserProfile up
+                              LEFT JOIN UserType ut ON ut.Id = up.UserTypeId
+                         WHERE up.IsDeactivated = 'true'
+                         ORDER BY up.DisplayName";
+
+                    var reader = cmd.ExecuteReader();
+
+                    var userprofiles = new List<UserProfile>();
+
+                    while (reader.Read())
+                    {
+                        UserProfile userProfile = new UserProfile
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
+                            UserTypeId = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
+                            IsDeactivated = reader.GetBoolean(reader.GetOrdinal("IsDeactivated")),
 
                             UserType = new UserType { Name = reader.GetString(reader.GetOrdinal("UserType")) }
                         };
@@ -128,7 +169,7 @@ namespace TabloidMVC.Repositories
                 {
                     cmd.CommandText = @"
                        SELECT u.id, u.FirstName, u.LastName, u.DisplayName, u.Email,
-                              u.CreateDateTime, u.ImageLocation, u.UserTypeId,
+                              u.CreateDateTime, u.ImageLocation, u.UserTypeId, u.IsDeactivated,
                               ut.[Name] AS UserTypeName
                          FROM UserProfile u
                               LEFT JOIN UserType ut ON u.UserTypeId = ut.id
@@ -149,6 +190,7 @@ namespace TabloidMVC.Repositories
                             DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
                             CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
                             ImageLocation = DbUtils.GetNullableString(reader, "ImageLocation"),
+                            IsDeactivated = reader.GetBoolean(reader.GetOrdinal("IsDeactivated")),
                             UserTypeId = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
                             UserType = new UserType()
                             {
@@ -190,6 +232,28 @@ namespace TabloidMVC.Repositories
                     cmd.Parameters.AddWithValue("@id", userProfile.Id);
 
                     cmd.Parameters.AddWithValue("@imageLocation", !String.IsNullOrEmpty(userProfile.ImageLocation) ? (object)userProfile.ImageLocation : DBNull.Value);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeactivateUser(UserProfile userProfile)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                            UPDATE UserProfile
+                            SET 
+                                IsDeactivated = @isDeactivated
+                            WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@isDeactivated", userProfile.IsDeactivated);
+                    cmd.Parameters.AddWithValue("@id", userProfile.Id);
 
                     cmd.ExecuteNonQuery();
                 }
