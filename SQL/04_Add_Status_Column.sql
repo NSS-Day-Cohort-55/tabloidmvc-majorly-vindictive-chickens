@@ -1,0 +1,1 @@
+﻿ALTER TABLE UserProfile DROP COLUMN Status;
