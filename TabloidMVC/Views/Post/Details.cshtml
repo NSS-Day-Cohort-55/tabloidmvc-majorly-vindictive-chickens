@@ -28,6 +28,9 @@
                 <a asp-action="CreatePostTag" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Add Tags">
                     <i class="fas fa-tag"></i>
                 </a>
+                <a asp-action="DeletePostTags" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Delete Tags">
+                    <i class="fas fa-ban"></i>
+                </a>
             </div>
         </section>
         <hr />
@@ -48,10 +51,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            
-            <td>
-                @Html.ActionLink("Delete", "Delete", new { id=item.Id })
             </td>
         </tr>
         <br />

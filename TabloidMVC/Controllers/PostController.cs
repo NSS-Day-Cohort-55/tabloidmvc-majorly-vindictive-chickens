@@ -90,6 +90,31 @@ namespace TabloidMVC.Controllers
             return View(vm);
         }
 
+        public IActionResult PostsByTag()
+        {
+            var vm = new PostsByTagViewModel
+            {
+                Tags = _tagRepository.GetAllTags(),
+                Posts = _postRepository.GetAllPublishedPosts()
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult PostsByTag(PostsByTagViewModel vm)
+        {
+            vm.Tags = _tagRepository.GetAllTags();
+            if (vm.SelectedTagId == 0)
+            {
+                vm.Posts = _postRepository.GetAllPublishedPosts();
+            }
+            else
+            {
+                vm.Posts = _postRepository.GetAllPostsByTag(vm.SelectedTagId);
+            }
+            return View(vm);
+        }
         public IActionResult Details(int id)
         {
             var vm = new PostDetailViewModel();
@@ -218,6 +243,43 @@ namespace TabloidMVC.Controllers
                     
                     
                     _postRepository.InsertTag(id, tagId);
+                }
+
+                return RedirectToAction("Details", "Post", new { id = id });
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        public ActionResult DeletePostTags(int id)
+        {
+            var tags = _tagRepository.GetAllTags();
+            var post = _postRepository.GetPublishedPostById(id);
+            var vm = new PostTagViewModel()
+            {
+                TagOptions = tags,
+                Post = post,
+                PostTags = _postRepository.GetTagsByPost(id)
+            };
+            return View(vm);
+        }
+
+        // POST: OwnersController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeletePostTags(PostTagViewModel vm, int id)
+        {
+            try
+            {
+
+
+                foreach (int tagId in vm.TagIds)
+                {
+
+
+                    _postRepository.DeleteTag(id, tagId);
                 }
 
                 return RedirectToAction("Details", "Post", new { id = id });
