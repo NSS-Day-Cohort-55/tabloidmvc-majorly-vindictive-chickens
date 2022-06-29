@@ -88,6 +88,31 @@ namespace TabloidMVC.Controllers
             return View(vm);
         }
 
+        public IActionResult PostsByTag()
+        {
+            var vm = new PostsByTagViewModel
+            {
+                Tags = _tagRepository.GetAllTags(),
+                Posts = _postRepository.GetAllPublishedPosts()
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult PostsByTag(PostsByTagViewModel vm)
+        {
+            vm.Tags = _tagRepository.GetAllTags();
+            if (vm.SelectedTagId == 0)
+            {
+                vm.Posts = _postRepository.GetAllPublishedPosts();
+            }
+            else
+            {
+                vm.Posts = _postRepository.GetAllPostsByTag(vm.SelectedTagId);
+            }
+            return View(vm);
+        }
         public IActionResult Details(int id)
         {
             var vm = new PostDetailViewModel();
