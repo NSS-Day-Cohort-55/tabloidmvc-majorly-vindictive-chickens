@@ -169,7 +169,8 @@ namespace TabloidMVC.Repositories
                 {
                     cmd.CommandText = @"
                        SELECT u.id, u.FirstName, u.LastName, u.DisplayName, u.Email,
-                              u.CreateDateTime, u.ImageLocation, u.UserTypeId, u.IsDeactivated,
+                              u.CreateDateTime, u.ImageLocation, u.UserTypeId, 
+                              u.IsDeactivated, u.DeactivatorId,
                               ut.[Name] AS UserTypeName
                          FROM UserProfile u
                               LEFT JOIN UserType ut ON u.UserTypeId = ut.id
@@ -191,6 +192,7 @@ namespace TabloidMVC.Repositories
                             CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
                             ImageLocation = DbUtils.GetNullableString(reader, "ImageLocation"),
                             IsDeactivated = reader.GetBoolean(reader.GetOrdinal("IsDeactivated")),
+                            DeactivatorId = reader.GetInt32(reader.GetOrdinal("DeactivatorId")),
                             UserTypeId = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
                             UserType = new UserType()
                             {
@@ -221,7 +223,8 @@ namespace TabloidMVC.Repositories
                                 DisplayName = @displayName,
                                 Email = @email, 
                                 UserTypeId = @userTypeId, 
-                                ImageLocation = @imageLocation
+                                ImageLocation = @imageLocation,
+                                DeactivatorId = @deactivatorId
                             WHERE Id = @id";
 
                     cmd.Parameters.AddWithValue("@firstName", userProfile.FirstName);
@@ -229,8 +232,9 @@ namespace TabloidMVC.Repositories
                     cmd.Parameters.AddWithValue("@displayName", userProfile.DisplayName);
                     cmd.Parameters.AddWithValue("@email", userProfile.Email);
                     cmd.Parameters.AddWithValue("@userTypeId", userProfile.UserTypeId);
+                    cmd.Parameters.AddWithValue("@deactivatorId", userProfile.DeactivatorId);
                     cmd.Parameters.AddWithValue("@id", userProfile.Id);
-
+                    
                     cmd.Parameters.AddWithValue("@imageLocation", !String.IsNullOrEmpty(userProfile.ImageLocation) ? (object)userProfile.ImageLocation : DBNull.Value);
 
                     cmd.ExecuteNonQuery();
