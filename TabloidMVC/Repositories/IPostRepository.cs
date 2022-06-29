@@ -18,5 +18,7 @@ namespace TabloidMVC.Repositories
         void InsertTag(int postId, int tagId);
         void DeleteTag(int postId, int tagId);
         public List<Tag> GetTagsByPost(int postId);
+        public void InsertReaction(int postId, int reactionId, int userProfileId);
+        public List<Reaction> GetReactionsByPost(int postId);
     }
 }

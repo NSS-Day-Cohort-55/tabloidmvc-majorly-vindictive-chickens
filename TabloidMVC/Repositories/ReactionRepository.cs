@@ -30,7 +30,7 @@ namespace TabloidMVC.Repositories
                         reactions.Add(new Reaction()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("id")),
-                            Name = reader.GetString(reader.GetOrdinal("name")),,
+                            Name = reader.GetString(reader.GetOrdinal("name")),
                             ImageLocation = reader.GetString(reader.GetOrdinal("imageLocation")),
                         });
                     }

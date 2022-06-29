@@ -31,6 +31,9 @@
                 <a asp-action="DeletePostTags" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Delete Tags">
                     <i class="fas fa-ban"></i>
                 </a>
+                <a asp-action="CreatePostReaction" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Add Reactions">
+                    <i class="fas fa-icons"></i>
+                </a>
             </div>
         </section>
         <hr />
@@ -54,6 +57,15 @@
             </td>
         </tr>
         <br />
-}
+        }       
+        @foreach (var item in Model.Reactions) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+        </tr>
+        <br />
+        }
     </div>
 </div>

@@ -18,13 +18,15 @@ namespace TabloidMVC.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly IReactionRepository _reactionRepository;
 
-        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository, IUserProfileRepository userProfileRepository, ITagRepository tagRepository)
+        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository, IUserProfileRepository userProfileRepository, ITagRepository tagRepository, IReactionRepository reactionRepository)
         {
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
             _userProfileRepository = userProfileRepository;
             _tagRepository = tagRepository;
+            _reactionRepository = reactionRepository;
         }
 
         public IActionResult Index()
@@ -120,8 +122,10 @@ namespace TabloidMVC.Controllers
             var vm = new PostDetailViewModel();
             var post = _postRepository.GetPublishedPostById(id);
             var tags = _postRepository.GetTagsByPost(id);
+            var reactions = _postRepository.GetReactionsByPost(id);
             vm.Tags = tags;
             vm.Post = post;
+            vm.Reactions = reactions;
             if (post == null)
             {
                 int userId = GetCurrentUserProfileId();
@@ -290,6 +294,85 @@ namespace TabloidMVC.Controllers
             }
         }
 
+
+        public IActionResult CreatePostReaction(int id)
+        {
+            var reactions = _reactionRepository.GetAllReactions();
+            var post = _postRepository.GetPublishedPostById(id);
+            var userId = GetCurrentUserProfileId();
+            var vm = new PostReactionViewModel()
+            {
+                ReactionOptions = reactions,
+                Post = post,
+                ReactionIds = new List<int>(),
+                UserId = userId,
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult CreatePostReaction(PostReactionViewModel vm, int id)
+        {
+            var reactions = _reactionRepository.GetAllReactions();
+            var post = _postRepository.GetPublishedPostById(id);
+            var userId = GetCurrentUserProfileId();
+            vm.ReactionOptions = reactions;
+            vm.Post = post;
+            vm.UserId = userId;
+           
+            try
+            {
+                foreach (int reactionId in vm.ReactionIds)
+                {
+
+
+                    _postRepository.InsertReaction(id, reactionId, vm.UserId);
+                }
+
+                return RedirectToAction("Details", "Post", new { id = id });
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        public ActionResult DeletePostReactions(int id)
+        {
+            var tags = _tagRepository.GetAllTags();
+            var post = _postRepository.GetPublishedPostById(id);
+            var vm = new PostTagViewModel()
+            {
+                TagOptions = tags,
+                Post = post,
+                PostTags = _postRepository.GetTagsByPost(id)
+            };
+            return View(vm);
+        }
+
+        // POST: OwnersController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeletePostReactions(PostTagViewModel vm, int id)
+        {
+            try
+            {
+
+
+                foreach (int tagId in vm.TagIds)
+                {
+
+
+                    _postRepository.DeleteTag(id, tagId);
+                }
+
+                return RedirectToAction("Details", "Post", new { id = id });
+            }
+            catch
+            {
+                return View();
+            }
+        }
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
