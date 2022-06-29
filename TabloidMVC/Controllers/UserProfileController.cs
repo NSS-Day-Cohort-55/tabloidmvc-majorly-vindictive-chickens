@@ -28,7 +28,13 @@ namespace TabloidMVC.Controllers
             var userProfiles = _userProfileRepository.GetAllUserProfiles();
             return View(userProfiles);
         }
-        
+
+        public IActionResult IndexDeactiveUsers()
+        {
+            var userProfiles = _userProfileRepository.GetAllDeactiveUserProfiles();
+            return View(userProfiles);
+        }
+
         public IActionResult Details(int id)
         {
             var userProfile = _userProfileRepository.GetUserProfileById(id);
@@ -87,7 +93,7 @@ namespace TabloidMVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Deactivate(int id, EditUserViewModel vm)
-        {
+        {       
             var userProfile = _userProfileRepository.GetUserProfileById(id);
             if (userProfile.IsDeactivated)
             {

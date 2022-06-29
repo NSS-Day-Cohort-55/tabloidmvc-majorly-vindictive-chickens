@@ -6,7 +6,7 @@
 
 <h1>Deactivate</h1>
 
-<h4>Are you sure you want to deactivate Model.UserProfile.DisplayName?</h4>
+<h4>Are you sure you want to deactivate @Model.UserProfile.DisplayName?</h4>
 
 <div>
     <hr />
@@ -32,61 +32,18 @@
     </dl>
     
     <form asp-action="Deactivate">
-        
-        <input type="submit" value="Deactivate" class="btn btn-danger" /> |
-
-
-        <input type="submit" value="Reactivate" class="btn btn-success" /> |
-
-
-        <a asp-action="Index">Back to List</a>
+        @if (Model.UserProfile.IsDeactivated)   
+        {
+            <input type="submit" value="Reactivate" class="btn btn-success" />
+            <input type="button" value="Cancel" class="btn btn-success" onclick="location.href='@Url.Action("Index","UserProfile")';"/>
+        }
+        else
+        {
+            <input type="submit" value="Deactivate" class="btn btn-danger" />
+            <input type="button" value="Cancel" class="btn btn-success" onclick="location.href='@Url.Action("Index","UserProfile")';"/>
+        }        
     </form>
+    <a asp-action="Index">Back to List</a>
 </div>
 
-@*
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.UserProfile.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserProfile.DisplayName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserProfile.UserType.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserProfile.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserProfile.DisplayName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserProfile.UserType.Name)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.UserProfile.Id }) |
-                @Html.ActionLink("Details", "Details", new { id=item.UserProfile.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id=item.UserProfile.Id }) |
-                @if (User.IsInRole("1"))
-                {
-                    @Html.ActionLink("Deactivate", "Deactivate", new { id = item.UserProfile.Id }, new { onclick = "return confirm('Are you sure?');" })
-                }
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-*@
 
