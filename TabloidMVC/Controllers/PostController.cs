@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 using System.Collections.Generic;
 using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
-using System.Collections.Generic;
 
 namespace TabloidMVC.Controllers
 {
@@ -218,43 +216,6 @@ namespace TabloidMVC.Controllers
                     
                     
                     _postRepository.InsertTag(id, tagId);
-                }
-
-                return RedirectToAction("Details", "Post", new { id = id });
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        public ActionResult DeletePostTags(int id)
-        {
-            var tags = _tagRepository.GetAllTags();
-            var post = _postRepository.GetPublishedPostById(id);
-            var vm = new PostTagViewModel()
-            {
-                TagOptions = tags,
-                Post = post,
-                PostTags = _postRepository.GetTagsByPost(id)
-            };
-            return View(vm);
-        }
-
-        // POST: OwnersController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeletePostTags(PostTagViewModel vm, int id)
-        {
-            try
-            {
-
-
-                foreach (int tagId in vm.TagIds)
-                {
-
-
-                    _postRepository.DeleteTag(id, tagId);
                 }
 
                 return RedirectToAction("Details", "Post", new { id = id });

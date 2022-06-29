@@ -59,6 +59,38 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        public IActionResult Delete(int id)
+        {
+            Comment comment = _commentRepository.GetCommentById(id);
+            if (comment.UserProfileId == GetCurrentUserProfileId())
+            {
+                return View(comment);
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Delete(int id, Comment comment)
+        {
+            try
+            {
+                _commentRepository.Delete(comment);
+
+                return RedirectToAction("Index", new {id});
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Details", new { id = comment.Id });
+            }
+        }
+
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
