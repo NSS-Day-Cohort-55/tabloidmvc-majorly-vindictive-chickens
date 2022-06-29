@@ -462,5 +462,70 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+        public List<Reaction> GetReactionsByPost(int postId)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT r.Name, r.ImageLocation, r.Id
+                                          FROM PostReaction p 
+                                               JOIN Reaction r ON p.ReactionId = r.Id 
+                                         Where p.PostId = @postId";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    var reader = cmd.ExecuteReader();
+
+                    List<Reaction> reactions = new List<Reaction>();
+                    while (reader.Read())
+                    {
+                        Reaction reaction = new Reaction()
+                        {
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                        };
+                        reactions.Add(reaction);
+                    }
+
+                    reader.Close();
+
+                    return reactions;
+                }
+            }
+        }
+        public void InsertReaction(int postId, int reactionId, int userProfileId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO PostReaction (PostId, ReactionId, UserProfileId)
+                                        VALUES (@postId, @reactionId, @userProfileId)";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    cmd.Parameters.AddWithValue("@reactionId", reactionId);
+                    cmd.Parameters.AddWithValue("@userProfileId", userProfileId);
+                    cmd.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+        }
+
+        public void DeleteReaction(int postId, int tagId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM PostTag
+                                        Where PostId = @postId AND
+                                        TagId = @tagId";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    cmd.Parameters.AddWithValue("@tagId", tagId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

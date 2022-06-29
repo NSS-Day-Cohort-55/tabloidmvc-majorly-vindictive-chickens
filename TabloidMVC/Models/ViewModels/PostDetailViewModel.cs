@@ -8,6 +8,8 @@ namespace TabloidMVC.Models.ViewModels
         public Post Post { get; set; }
         public List<int> PostTagIds { get; set; }
         public List<Tag> Tags { get; set; }
-        
+        public List<int> PostReactionIds { get; set; }
+        public List<Reaction> Reactions { get; set; }
+
     }
 }
