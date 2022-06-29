@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 using System.Collections.Generic;
 using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
-using System.Collections.Generic;
 
 namespace TabloidMVC.Controllers
 {
@@ -257,6 +255,7 @@ namespace TabloidMVC.Controllers
             }
         }
 
+
         public ActionResult DeletePostTags(int id)
         {
             var tags = _tagRepository.GetAllTags();
@@ -373,6 +372,7 @@ namespace TabloidMVC.Controllers
                 return View();
             }
         }
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
