@@ -104,8 +104,9 @@ namespace TabloidMVC.Controllers
                      && userProfile.DeactivatorId != 0) ||
                     userProfile.UserTypeId == 2)
                 {
-                    userProfile.IsDeactivated = true;
                     userProfile.DeactivatorId = GetCurrentUserProfileId();
+                    _userProfileRepository.UpdateUser(userProfile);
+                    userProfile.IsDeactivated = true;
                 }
                 else if (userProfile.UserTypeId == 1 && userProfile.DeactivatorId == 0)
                 {
