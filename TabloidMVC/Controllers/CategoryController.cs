@@ -47,5 +47,29 @@ namespace TabloidMVC.Controllers
                 return View(category);
             }
         }
+
+        public IActionResult Delete(int id)
+        {
+            Category category = _categoryRepository.GetCategory(id);
+
+            return View(category);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id, Category category)
+        {
+            try
+            {
+                _categoryRepository.DeleteCategory(id);
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(category);
+            }
+        }
     }
 }
