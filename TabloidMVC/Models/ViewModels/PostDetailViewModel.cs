@@ -12,7 +12,7 @@ namespace TabloidMVC.Models.ViewModels
         public List<int> PostReactionIds { get; set; }
         public List<string> Reactions { get; set; }
         public List<Reaction> ReactionList { get; set; }
-
+        public Subscription Subscription { get; set; }
         public int ReactionCount(List<Reaction> Reactions, string url)
         {
             int x = Reactions

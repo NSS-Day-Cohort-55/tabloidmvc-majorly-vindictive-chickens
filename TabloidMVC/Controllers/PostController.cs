@@ -46,7 +46,7 @@ namespace TabloidMVC.Controllers
                 UserProfiles = _userProfileRepository.GetAllUserProfiles(),
                 Posts = _postRepository.GetAllPublishedPosts()
             };
-      
+
             return View(vm);
         }
 
@@ -122,11 +122,15 @@ namespace TabloidMVC.Controllers
             var post = _postRepository.GetPublishedPostById(id);
             var tags = _postRepository.GetTagsByPost(id);
             vm.ReactionList = _postRepository.GetReactionsByPost(id);
-            List<string> reactions = new List<string>(); 
-                reactions = DistinctReactions(vm.ReactionList);
+            List<string> reactions = new List<string>();
+            reactions = DistinctReactions(vm.ReactionList);
+            int subscriberId = GetCurrentUserProfileId();
+            var subscription = _postRepository.GetSubscriptionByAuthorId(subscriberId, vm.Post.UserProfileId);
             vm.Tags = tags;
             vm.Post = post;
             vm.Reactions = reactions;
+            vm.Subscription = subscription;
+
             if (post == null)
             {
                 int userId = GetCurrentUserProfileId();
@@ -146,7 +150,7 @@ namespace TabloidMVC.Controllers
         }
         public List<string> DistinctReactions(List<Reaction> reactions)
         {
-            return reactions.Select(r=>r.ImageLocation).Distinct().ToList();
+            return reactions.Select(r => r.ImageLocation).Distinct().ToList();
         }
         public IActionResult Create()
         {
@@ -254,8 +258,8 @@ namespace TabloidMVC.Controllers
 
                 foreach (int tagId in vm.TagIds)
                 {
-                    
-                    
+
+
                     _postRepository.InsertTag(id, tagId);
                 }
 
@@ -330,7 +334,7 @@ namespace TabloidMVC.Controllers
             vm.ReactionOptions = reactions;
             vm.Post = post;
             vm.UserId = userId;
-           
+
             try
             {
                 foreach (int reactionId in vm.ReactionIds)
