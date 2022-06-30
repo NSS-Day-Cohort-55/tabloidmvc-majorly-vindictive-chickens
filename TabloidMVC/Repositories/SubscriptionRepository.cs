@@ -73,5 +73,26 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+        public void Update(Subscription subscription)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Subscription 
+                                        SET EndDateTime = @endDateTime
+                                        WHERE SubscriberUserProfileId = @subscriberId AND 
+                                              ProviderUserProfileId = @providerId";
+
+                    cmd.Parameters.AddWithValue("@endDateTime", subscription.EndDateTime);
+                    cmd.Parameters.AddWithValue("@subscriberId", subscription.SubscriberUserProfileId);
+                    cmd.Parameters.AddWithValue("@providerId", subscription.ProviderUserProfileId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

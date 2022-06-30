@@ -1,4 +1,4 @@
-﻿@model TabloidMVC.Models.ViewModels.PostDetailViewModel
+﻿@model TabloidMVC.Models.ViewModels.PostDetailViewModel;
 
 @{
     ViewData["Title"] = $"Post - {Model.Post.Title}";
@@ -34,13 +34,30 @@
                 <a asp-action="CreatePostReaction" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Add Reactions">
                     <i class="fas fa-icons"></i>
                 </a>
-                <a asp-controller="Subscription" asp-action="Create" asp-route-id="@Model.Post.UserProfileId" class="btn btn-outline-primary mx-1" title="Add Subscription">
-                    <i class="fas fa-mail-bulk"></i>
-                </a>
+                @if (Model.Subscription == null)
+                {
+                    <a asp-controller="Subscription" asp-action="Create" asp-route-id="@Model.Post.UserProfileId" class="btn btn-outline-primary mx-1" title="Subscribe">
+                        <i class="fas fa-mail-bulk"></i>
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Subscription" asp-action="Edit" asp-route-id="@Model.Post.UserProfileId" class="btn btn-outline-primary mx-1" title="Unsubscribe">
+                        <i class="fab fa-rev"></i>
+                    </a>
+                }
             </div>
         </section>
         <hr />
-        @if (!string.IsNullOrWhiteSpace(Model.Post.ImageLocation))
+        @if (Model.Post.ImageLocation == "DB")
+        {
+            <section class="row justify-content-center">
+                <div>
+                    <img src="@Url.Action("PostImage", new {id = Model.PostImage.Id})" alt="cool image" />
+                </div>
+            </section>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.Post.ImageLocation))
         {
             <section class="row justify-content-center">
                 <div>
@@ -48,15 +65,18 @@
                 </div>
             </section>
         }
-        
+
         <section class="row post__content">
             <p class="col-sm-12 mt-5">@Html.DisplayFor(model => model.Post.Content)</p>
 
         </section>
+        
         @foreach (var item in Model.Tags) {
         <tr>
+            
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
+                
             </td>
         </tr>
         <br />
@@ -64,8 +84,8 @@
         @foreach (var item in Model.Reactions) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
-                @Html.DisplayFor(modelItem => item.Id)
+                <img src="@Html.DisplayFor(modelItem=>item)" style="height:30px;width:40px;"/>
+                @Model.ReactionCount(Model.ReactionList, item)
             </td>
         </tr>
         <br />

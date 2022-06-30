@@ -1,0 +1,29 @@
+﻿@model TabloidMVC.Models.ViewModels.PostImageViewModel
+
+@{
+    ViewData["Title"] = "AddPostImage";
+}
+
+<h1>AddPostImage</h1>
+
+<div>
+    <h4>PostImage</h4>
+    <hr />
+    <form enctype="multipart/form-data" method="post">
+        <form enctype="multipart/form-data" method="post">
+            <dl>
+                <dt>
+                    <label asp-for="File"></label>
+                </dt>
+                <dd>
+                    <input asp-for="File" type="file">
+                </dd>
+            </dl>
+            <input asp-page-handler="Upload" class="btn" type="submit" value="Upload">
+        </form>
+    </form>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>

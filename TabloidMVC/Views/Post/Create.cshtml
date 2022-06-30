@@ -10,7 +10,7 @@
     <div class="row justify-content-center">
         <div class="card col-md-12 col-lg-8">
             <h3 class="mt-3 text-primary text-center card-title">What do you have to say?</h3>
-            <form class="mt-5 card-body" asp-action="Create">
+            <form class="mt-5 card-body" asp-action="Create" enctype="multipart/form-data" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="Post.Title" class="control-label"></label>
@@ -21,6 +21,16 @@
                     <label asp-for="Post.ImageLocation" class="control-label"></label>
                     <input asp-for="Post.ImageLocation" class="form-control" />
                     <span asp-validation-for="Post.ImageLocation" class="text-danger"></span>
+                </div>
+                <div>
+                        <dl>
+                            <dt>
+                                <label asp-for="File"></label>
+                            </dt>
+                            <dd>
+                                <input asp-for="File" type="file">
+                            </dd>
+                        </dl>
                 </div>
                 <div class="form-group">
                     <label asp-for="Post.PublishDateTime" class="control-label"></label>
@@ -55,5 +65,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

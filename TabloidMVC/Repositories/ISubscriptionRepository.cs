@@ -7,5 +7,6 @@ namespace TabloidMVC.Repositories
     {
         List<Subscription> GetAllSubscriptions();
         void Add(Subscription subscription);
+        void Update(Subscription subscription);
     }
 }
