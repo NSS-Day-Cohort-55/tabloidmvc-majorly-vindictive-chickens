@@ -71,5 +71,27 @@ namespace TabloidMVC.Controllers
                 return View(category);
             }
         }
+
+        public IActionResult Edit(int id)
+        {
+            Category category = _categoryRepository.GetCategory(id);
+                return category == null ? NotFound() : View(category);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Edit(int id, Category category)
+        {
+            try
+            {
+                _categoryRepository.UpdateCategory(category);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(category);
+            }
+        }
     }
 }
