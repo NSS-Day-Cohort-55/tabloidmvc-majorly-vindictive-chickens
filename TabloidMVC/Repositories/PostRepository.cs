@@ -490,6 +490,7 @@ namespace TabloidMVC.Repositories
         {
             using (SqlConnection conn = Connection)
             {
+                conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"

@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-<<<<<<< HEAD
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-=======
->>>>>>> main
 using Microsoft.VisualBasic;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -133,9 +130,9 @@ namespace TabloidMVC.Controllers
             List<string> reactions = new List<string>();
             reactions = DistinctReactions(vm.ReactionList);
             int subscriberId = GetCurrentUserProfileId();
-            var subscription = _postRepository.GetSubscriptionByAuthorId(subscriberId, vm.Post.UserProfileId);
             vm.Tags = tags;
             vm.Post = post;
+            var subscription = _postRepository.GetSubscriptionByAuthorId(subscriberId, vm.Post.UserProfileId);
             vm.PostImage = _postRepository.GetPostImageByPostId(id);
             vm.Reactions = reactions;
             vm.Subscription = subscription;
@@ -344,7 +341,6 @@ namespace TabloidMVC.Controllers
             }
         }
 
-<<<<<<< HEAD
         public ActionResult PostImage(int id)
         {
             Stream img = _postRepository.GetPostImageById(id);
@@ -356,8 +352,6 @@ namespace TabloidMVC.Controllers
 
             return NotFound();
         }
-
-=======
 
         public IActionResult CreatePostReaction(int id)
         {
@@ -437,7 +431,6 @@ namespace TabloidMVC.Controllers
                 return View();
             }
         }
->>>>>>> main
 
         private int GetCurrentUserProfileId()
         {
