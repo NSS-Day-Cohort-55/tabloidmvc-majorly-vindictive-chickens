@@ -22,5 +22,8 @@ namespace TabloidMVC.Repositories
         Stream GetPostImageById(int id);
         PostImage GetPostImageByPostId(int postId);
         public List<Tag> GetTagsByPost(int postId);
+        public void InsertReaction(int postId, int reactionId, int userProfileId);
+        public List<Reaction> GetReactionsByPost(int postId);
+        Subscription GetSubscriptionByAuthorId(int subscriberId, int authorId);
     }
 }

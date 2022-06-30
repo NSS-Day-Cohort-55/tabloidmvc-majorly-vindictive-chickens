@@ -27,7 +27,13 @@ namespace TabloidMVC.Controllers
             var userProfiles = _userProfileRepository.GetAllUserProfiles();
             return View(userProfiles);
         }
-        
+
+        public IActionResult IndexDeactiveUsers()
+        {
+            var userProfiles = _userProfileRepository.GetAllDeactiveUserProfiles();
+            return View(userProfiles);
+        }
+
         public IActionResult Details(int id)
         {
             var userProfile = _userProfileRepository.GetUserProfileById(id);
@@ -66,6 +72,62 @@ namespace TabloidMVC.Controllers
                 return View(userProfile);
             }
         }
+
+        // GET: UserProfile/Edit/5
+        public ActionResult Deactivate(int id)
+        {
+            var userProfile = _userProfileRepository.GetUserProfileById(id);
+            if (userProfile == null)
+            {
+                return NotFound();
+            }
+
+            EditUserViewModel vm = new EditUserViewModel()
+            {
+                UserProfile = userProfile
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Deactivate(int id, EditUserViewModel vm)
+        {       
+            var userProfile = _userProfileRepository.GetUserProfileById(id);
+            if (userProfile.IsDeactivated)
+            {
+                userProfile.IsDeactivated = false;
+            }
+            else
+            {
+                if ((userProfile.UserTypeId == 1 && userProfile.DeactivatorId != GetCurrentUserProfileId() 
+                     && userProfile.DeactivatorId != 0) ||
+                    userProfile.UserTypeId == 2)
+                {
+                    userProfile.DeactivatorId = GetCurrentUserProfileId();
+                    _userProfileRepository.UpdateUser(userProfile);
+                    userProfile.IsDeactivated = true;
+                }
+                else if (userProfile.UserTypeId == 1 && userProfile.DeactivatorId == 0)
+                {
+                    userProfile.DeactivatorId = GetCurrentUserProfileId();
+                    _userProfileRepository.UpdateUser(userProfile);
+                    return RedirectToAction("Index");
+                }
+            }
+
+            try
+            {
+                _userProfileRepository.DeactivateUser(userProfile);
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(vm);
+            }
+        }
+
         /*
         public IActionResult Create()
         {
@@ -93,13 +155,13 @@ namespace TabloidMVC.Controllers
                 return View(vm);
             }
         }
+        */
 
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
         }
-        */
     }
 }
 

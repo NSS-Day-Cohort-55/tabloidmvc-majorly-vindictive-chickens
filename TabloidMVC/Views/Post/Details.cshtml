@@ -1,4 +1,4 @@
-﻿@model TabloidMVC.Models.ViewModels.PostDetailViewModel
+﻿@model TabloidMVC.Models.ViewModels.PostDetailViewModel;
 
 @{
     ViewData["Title"] = $"Post - {Model.Post.Title}";
@@ -31,6 +31,21 @@
                 <a asp-action="DeletePostTags" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Delete Tags">
                     <i class="fas fa-ban"></i>
                 </a>
+                <a asp-action="CreatePostReaction" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Add Reactions">
+                    <i class="fas fa-icons"></i>
+                </a>
+                @if (Model.Subscription == null)
+                {
+                    <a asp-controller="Subscription" asp-action="Create" asp-route-id="@Model.Post.UserProfileId" class="btn btn-outline-primary mx-1" title="Subscribe">
+                        <i class="fas fa-mail-bulk"></i>
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Subscription" asp-action="Edit" asp-route-id="@Model.Post.UserProfileId" class="btn btn-outline-primary mx-1" title="Unsubscribe">
+                        <i class="fab fa-rev"></i>
+                    </a>
+                }
             </div>
         </section>
         <hr />
@@ -55,13 +70,25 @@
             <p class="col-sm-12 mt-5">@Html.DisplayFor(model => model.Post.Content)</p>
 
         </section>
+        
         @foreach (var item in Model.Tags) {
         <tr>
+            
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
+                
             </td>
         </tr>
         <br />
-}
+        }       
+        @foreach (var item in Model.Reactions) {
+        <tr>
+            <td>
+                <img src="@Html.DisplayFor(modelItem=>item)" style="height:30px;width:40px;"/>
+                @Model.ReactionCount(Model.ReactionList, item)
+            </td>
+        </tr>
+        <br />
+        }
     </div>
 </div>

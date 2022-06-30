@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+<<<<<<< HEAD
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+=======
+>>>>>>> main
 using Microsoft.VisualBasic;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -11,8 +14,8 @@ using System;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
-using System.Collections.Generic;
-
+using System;
+using System.Linq;
 namespace TabloidMVC.Controllers
 {
     [Authorize]
@@ -22,13 +25,15 @@ namespace TabloidMVC.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly IReactionRepository _reactionRepository;
 
-        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository, IUserProfileRepository userProfileRepository, ITagRepository tagRepository)
+        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository, IUserProfileRepository userProfileRepository, ITagRepository tagRepository, IReactionRepository reactionRepository)
         {
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
             _userProfileRepository = userProfileRepository;
             _tagRepository = tagRepository;
+            _reactionRepository = reactionRepository;
         }
 
         public IActionResult Index()
@@ -124,9 +129,17 @@ namespace TabloidMVC.Controllers
             var vm = new PostDetailViewModel();
             var post = _postRepository.GetPublishedPostById(id);
             var tags = _postRepository.GetTagsByPost(id);
+            vm.ReactionList = _postRepository.GetReactionsByPost(id);
+            List<string> reactions = new List<string>();
+            reactions = DistinctReactions(vm.ReactionList);
+            int subscriberId = GetCurrentUserProfileId();
+            var subscription = _postRepository.GetSubscriptionByAuthorId(subscriberId, vm.Post.UserProfileId);
             vm.Tags = tags;
             vm.Post = post;
             vm.PostImage = _postRepository.GetPostImageByPostId(id);
+            vm.Reactions = reactions;
+            vm.Subscription = subscription;
+
             if (post == null)
             {
                 int userId = GetCurrentUserProfileId();
@@ -138,7 +151,16 @@ namespace TabloidMVC.Controllers
             }
             return View(vm);
         }
-
+        public int ReactionCount(List<Reaction> Reactions, string url)
+        {
+            int x = Reactions
+            .Count(r => r.ImageLocation == url);
+            return x;
+        }
+        public List<string> DistinctReactions(List<Reaction> reactions)
+        {
+            return reactions.Select(r => r.ImageLocation).Distinct().ToList();
+        }
         public IActionResult Create()
         {
             var vm = new PostFormViewModel()
@@ -289,6 +311,7 @@ namespace TabloidMVC.Controllers
             }
         }
 
+
         public ActionResult DeletePostTags(int id)
         {
             var tags = _tagRepository.GetAllTags();
@@ -321,6 +344,7 @@ namespace TabloidMVC.Controllers
             }
         }
 
+<<<<<<< HEAD
         public ActionResult PostImage(int id)
         {
             Stream img = _postRepository.GetPostImageById(id);
@@ -333,6 +357,87 @@ namespace TabloidMVC.Controllers
             return NotFound();
         }
 
+=======
+
+        public IActionResult CreatePostReaction(int id)
+        {
+            var reactions = _reactionRepository.GetAllReactions();
+            var post = _postRepository.GetPublishedPostById(id);
+            var userId = GetCurrentUserProfileId();
+            var vm = new PostReactionViewModel()
+            {
+                ReactionOptions = reactions,
+                Post = post,
+                ReactionIds = new List<int>(),
+                UserId = userId,
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult CreatePostReaction(PostReactionViewModel vm, int id)
+        {
+            var reactions = _reactionRepository.GetAllReactions();
+            var post = _postRepository.GetPublishedPostById(id);
+            var userId = GetCurrentUserProfileId();
+            vm.ReactionOptions = reactions;
+            vm.Post = post;
+            vm.UserId = userId;
+
+            try
+            {
+                foreach (int reactionId in vm.ReactionIds)
+                {
+
+
+                    _postRepository.InsertReaction(id, reactionId, vm.UserId);
+                }
+
+                return RedirectToAction("Details", "Post", new { id = id });
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        public ActionResult DeletePostReactions(int id)
+        {
+            var tags = _tagRepository.GetAllTags();
+            var post = _postRepository.GetPublishedPostById(id);
+            var vm = new PostTagViewModel()
+            {
+                TagOptions = tags,
+                Post = post,
+                PostTags = _postRepository.GetTagsByPost(id)
+            };
+            return View(vm);
+        }
+
+        // POST: OwnersController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeletePostReactions(PostTagViewModel vm, int id)
+        {
+            try
+            {
+
+
+                foreach (int tagId in vm.TagIds)
+                {
+
+
+                    _postRepository.DeleteTag(id, tagId);
+                }
+
+                return RedirectToAction("Details", "Post", new { id = id });
+            }
+            catch
+            {
+                return View();
+            }
+        }
+>>>>>>> main
 
         private int GetCurrentUserProfileId()
         {

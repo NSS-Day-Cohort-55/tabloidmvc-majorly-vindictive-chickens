@@ -469,7 +469,7 @@ namespace TabloidMVC.Repositories
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
                         INSERT INTO PostImage ( Content, PostId )
@@ -482,13 +482,14 @@ namespace TabloidMVC.Repositories
                     img.Id = (int)cmd.ExecuteScalar();
                 }
             }
+            
+        
         }
 
         public PostImage GetPostImageByPostId(int postId)
         {
             using (SqlConnection conn = Connection)
             {
-                conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
@@ -540,5 +541,112 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+        public List<Reaction> GetReactionsByPost(int postId)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT r.ImageLocation, r.Name, r.Id
+                                          FROM PostReaction p 
+                                               JOIN Reaction r ON p.ReactionId = r.Id 
+                                         Where p.PostId = @postId";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    var reader = cmd.ExecuteReader();
+
+                    List<Reaction> reactions = new List<Reaction>();
+                    while (reader.Read())
+                    {
+                        Reaction reaction = new Reaction()
+                        {
+                            ImageLocation = reader.GetString(reader.GetOrdinal("ImageLocation")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Id = reader.GetInt32(reader.GetOrdinal("Id"))
+                        };
+                        reactions.Add(reaction);
+                    }
+
+                    reader.Close();
+
+                    return reactions;
+                }
+            }
+        }
+
+       
+
+        public void InsertReaction(int postId, int reactionId, int userProfileId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO PostReaction (PostId, ReactionId, UserProfileId)
+                                        VALUES (@postId, @reactionId, @userProfileId)";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    cmd.Parameters.AddWithValue("@reactionId", reactionId);
+                    cmd.Parameters.AddWithValue("@userProfileId", userProfileId);
+                    cmd.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+        }
+
+        public void DeleteReaction(int postId, int tagId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM PostTag
+                                        Where PostId = @postId AND
+                                        TagId = @tagId";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+                    cmd.Parameters.AddWithValue("@tagId", tagId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public Subscription GetSubscriptionByAuthorId(int subscriberId, int authorId)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                       SELECT s.Id, s.SubscriberUserProfileId, s.ProviderUserProfileId,
+                              s.BeginDateTime
+                         FROM Subscription s
+                        WHERE SubscriberUserProfileId = @subId and ProviderUserProfileId = @authId";
+
+                    cmd.Parameters.AddWithValue("@subId", subscriberId);
+                    cmd.Parameters.AddWithValue("@authId", authorId);
+                    var reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        Subscription subscription = new Subscription()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            SubscriberUserProfileId = reader.GetInt32(reader.GetOrdinal("SubscriberUserProfileId")),
+                            ProviderUserProfileId = reader.GetInt32(reader.GetOrdinal("ProviderUserProfileId")),
+                            BeginDateTime = reader.GetDateTime(reader.GetOrdinal("BeginDateTime"))                            
+                        };
+                        return subscription;
+                    }
+                    else 
+                    { 
+                        return null;
+                    }
+
+                }
+            }
+        }
+
     }
 }

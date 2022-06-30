@@ -17,7 +17,7 @@ namespace TabloidMVC.Models
         public string Subject { get; set; }
         [Required]
         public string Content { get; set; }
-        public DateTime CreatedDateTime { get; set; }
+        public DateTime CreateDateTime { get; set; }
 
 
     }
