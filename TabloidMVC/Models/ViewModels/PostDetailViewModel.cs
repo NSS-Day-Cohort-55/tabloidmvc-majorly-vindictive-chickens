@@ -9,6 +9,9 @@ namespace TabloidMVC.Models.ViewModels
         public Post Post { get; set; }
         public List<int> PostTagIds { get; set; }
         public List<Tag> Tags { get; set; }
+
+        public PostImage PostImage { get; set; }
+        
         public List<int> PostReactionIds { get; set; }
         public List<string> Reactions { get; set; }
         public List<Reaction> ReactionList { get; set; }

@@ -49,7 +49,15 @@
             </div>
         </section>
         <hr />
-        @if (!string.IsNullOrWhiteSpace(Model.Post.ImageLocation))
+        @if (Model.Post.ImageLocation == "DB")
+        {
+            <section class="row justify-content-center">
+                <div>
+                    <img src="@Url.Action("PostImage", new {id = Model.PostImage.Id})" alt="cool image" />
+                </div>
+            </section>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.Post.ImageLocation))
         {
             <section class="row justify-content-center">
                 <div>
@@ -57,7 +65,7 @@
                 </div>
             </section>
         }
-        
+
         <section class="row post__content">
             <p class="col-sm-12 mt-5">@Html.DisplayFor(model => model.Post.Content)</p>
 
