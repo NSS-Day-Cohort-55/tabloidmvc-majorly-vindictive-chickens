@@ -6,7 +6,8 @@ using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
-
+using System;
+using System.Linq;
 namespace TabloidMVC.Controllers
 {
     [Authorize]
@@ -45,7 +46,7 @@ namespace TabloidMVC.Controllers
                 UserProfiles = _userProfileRepository.GetAllUserProfiles(),
                 Posts = _postRepository.GetAllPublishedPosts()
             };
-      
+
             return View(vm);
         }
 
@@ -120,9 +121,11 @@ namespace TabloidMVC.Controllers
             var vm = new PostDetailViewModel();
             var post = _postRepository.GetPublishedPostById(id);
             var tags = _postRepository.GetTagsByPost(id);
-            var reactions = _postRepository.GetReactionsByPost(id);
+            vm.ReactionList = _postRepository.GetReactionsByPost(id);
+            List<string> reactions = new List<string>();
+            reactions = DistinctReactions(vm.ReactionList);
             int subscriberId = GetCurrentUserProfileId();
-            var subscription = _postRepository.GetSubscriptionByAuthorId(subscriberId, post.UserProfileId);
+            var subscription = _postRepository.GetSubscriptionByAuthorId(subscriberId, vm.Post.UserProfileId);
             vm.Tags = tags;
             vm.Post = post;
             vm.Reactions = reactions;
@@ -139,7 +142,16 @@ namespace TabloidMVC.Controllers
             }
             return View(vm);
         }
-
+        public int ReactionCount(List<Reaction> Reactions, string url)
+        {
+            int x = Reactions
+            .Count(r => r.ImageLocation == url);
+            return x;
+        }
+        public List<string> DistinctReactions(List<Reaction> reactions)
+        {
+            return reactions.Select(r => r.ImageLocation).Distinct().ToList();
+        }
         public IActionResult Create()
         {
             var vm = new PostFormViewModel();
@@ -246,8 +258,8 @@ namespace TabloidMVC.Controllers
 
                 foreach (int tagId in vm.TagIds)
                 {
-                    
-                    
+
+
                     _postRepository.InsertTag(id, tagId);
                 }
 
@@ -322,7 +334,7 @@ namespace TabloidMVC.Controllers
             vm.ReactionOptions = reactions;
             vm.Post = post;
             vm.UserId = userId;
-           
+
             try
             {
                 foreach (int reactionId in vm.ReactionIds)

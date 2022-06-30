@@ -470,7 +470,7 @@ namespace TabloidMVC.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT r.Name, r.ImageLocation, r.Id
+                    cmd.CommandText = @"SELECT r.ImageLocation, r.Name, r.Id
                                           FROM PostReaction p 
                                                JOIN Reaction r ON p.ReactionId = r.Id 
                                          Where p.PostId = @postId";
@@ -482,7 +482,9 @@ namespace TabloidMVC.Repositories
                     {
                         Reaction reaction = new Reaction()
                         {
+                            ImageLocation = reader.GetString(reader.GetOrdinal("ImageLocation")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Id = reader.GetInt32(reader.GetOrdinal("Id"))
                         };
                         reactions.Add(reaction);
                     }
@@ -493,6 +495,9 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+       
+
         public void InsertReaction(int postId, int reactionId, int userProfileId)
         {
             using (SqlConnection conn = Connection)
