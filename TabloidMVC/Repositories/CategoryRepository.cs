@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using TabloidMVC.Models;
 
@@ -51,5 +52,56 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+        public void DeleteCategory(int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM Category WHERE id = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        
+        public Category GetCategory(int id)
+        {
+            using (var conn = Connection)
+
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Name
+                                        FROM Category
+                                        WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Category category = new Category()
+                            {
+                                Id = id,
+                                Name = reader.GetString(reader.GetOrdinal("Name"))
+                            };
+                            return category;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+
+            }
+        }
+
     }
 }
