@@ -1,4 +1,4 @@
-﻿@model TabloidMVC.Models.ViewModels.PostDetailViewModel
+﻿@model TabloidMVC.Models.ViewModels.PostDetailViewModel;
 
 @{
     ViewData["Title"] = $"Post - {Model.Post.Title}";
@@ -50,10 +50,13 @@
             <p class="col-sm-12 mt-5">@Html.DisplayFor(model => model.Post.Content)</p>
 
         </section>
+        
         @foreach (var item in Model.Tags) {
         <tr>
+            
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
+                
             </td>
         </tr>
         <br />
@@ -61,8 +64,8 @@
         @foreach (var item in Model.Reactions) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
-                @Html.DisplayFor(modelItem => item.Id)
+                <img src="@Html.DisplayFor(modelItem=>item)" style="height:30px;width:40px;"/>
+                @Model.ReactionCount(Model.ReactionList, item)
             </td>
         </tr>
         <br />
