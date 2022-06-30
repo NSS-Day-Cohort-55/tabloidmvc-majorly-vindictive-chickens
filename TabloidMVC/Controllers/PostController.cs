@@ -6,7 +6,8 @@ using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
-
+using System;
+using System.Linq;
 namespace TabloidMVC.Controllers
 {
     [Authorize]
@@ -120,7 +121,9 @@ namespace TabloidMVC.Controllers
             var vm = new PostDetailViewModel();
             var post = _postRepository.GetPublishedPostById(id);
             var tags = _postRepository.GetTagsByPost(id);
-            var reactions = _postRepository.GetReactionsByPost(id);
+            vm.ReactionList = _postRepository.GetReactionsByPost(id);
+            List<string> reactions = new List<string>(); 
+                reactions = DistinctReactions(vm.ReactionList);
             vm.Tags = tags;
             vm.Post = post;
             vm.Reactions = reactions;
@@ -135,7 +138,16 @@ namespace TabloidMVC.Controllers
             }
             return View(vm);
         }
-
+        public int ReactionCount(List<Reaction> Reactions, string url)
+        {
+            int x = Reactions
+            .Count(r => r.ImageLocation == url);
+            return x;
+        }
+        public List<string> DistinctReactions(List<Reaction> reactions)
+        {
+            return reactions.Select(r=>r.ImageLocation).Distinct().ToList();
+        }
         public IActionResult Create()
         {
             var vm = new PostFormViewModel();
