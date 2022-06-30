@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using System.IO;
+using System;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
@@ -45,7 +49,7 @@ namespace TabloidMVC.Controllers
                 UserProfiles = _userProfileRepository.GetAllUserProfiles(),
                 Posts = _postRepository.GetAllPublishedPosts()
             };
-      
+
             return View(vm);
         }
 
@@ -122,6 +126,7 @@ namespace TabloidMVC.Controllers
             var tags = _postRepository.GetTagsByPost(id);
             vm.Tags = tags;
             vm.Post = post;
+            vm.PostImage = _postRepository.GetPostImageByPostId(id);
             if (post == null)
             {
                 int userId = GetCurrentUserProfileId();
@@ -136,21 +141,51 @@ namespace TabloidMVC.Controllers
 
         public IActionResult Create()
         {
-            var vm = new PostFormViewModel();
+            var vm = new PostFormViewModel()
+            {
+                PostImage = new PostImage()
+            };
             vm.CategoryOptions = _categoryRepository.GetAll();
             return View(vm);
         }
 
         [HttpPost]
-        public IActionResult Create(PostFormViewModel vm)
+        public async Task<ActionResult> Create(PostFormViewModel vm, int id)
         {
             try
             {
                 vm.Post.CreateDateTime = DateAndTime.Now;
                 vm.Post.IsApproved = true;
                 vm.Post.UserProfileId = GetCurrentUserProfileId();
+                if (vm.File != null)
+                {
+                    vm.Post.ImageLocation = "DB";
+                }
 
                 _postRepository.Add(vm.Post);
+
+                if (vm.File != null)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await vm.File.CopyToAsync(memoryStream);
+                        // Upload the file if less than 2 MB
+                        if (memoryStream.Length < 2097152)
+                        {
+                            vm.PostImage = new PostImage
+                            {
+                                PostId = vm.Post.Id,
+                                Content = memoryStream.ToArray()
+                            };
+
+                            _postRepository.AddPostImage(vm.PostImage);
+                        }
+                        else
+                        {
+                            throw (new Exception());
+                        }
+                    }
+                }
 
                 return RedirectToAction("Details", new { id = vm.Post.Id });
             }
@@ -160,6 +195,7 @@ namespace TabloidMVC.Controllers
                 return View(vm);
             }
         }
+
         public IActionResult Edit(int id)
         {
             var vm = new PostFormViewModel
@@ -240,8 +276,8 @@ namespace TabloidMVC.Controllers
 
                 foreach (int tagId in vm.TagIds)
                 {
-                    
-                    
+
+
                     _postRepository.InsertTag(id, tagId);
                 }
 
@@ -273,15 +309,10 @@ namespace TabloidMVC.Controllers
         {
             try
             {
-
-
                 foreach (int tagId in vm.TagIds)
                 {
-
-
                     _postRepository.DeleteTag(id, tagId);
                 }
-
                 return RedirectToAction("Details", "Post", new { id = id });
             }
             catch
@@ -289,6 +320,19 @@ namespace TabloidMVC.Controllers
                 return View();
             }
         }
+
+        public ActionResult PostImage(int id)
+        {
+            Stream img = _postRepository.GetPostImageById(id);
+
+            if (img != null)
+            {
+                return File(img, "image/jpeg", $"img_{id}.jpg");
+            }
+
+            return NotFound();
+        }
+
 
         private int GetCurrentUserProfileId()
         {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using TabloidMVC.Models;
 
 namespace TabloidMVC.Repositories
@@ -17,6 +18,9 @@ namespace TabloidMVC.Repositories
         Post GetUserPostById(int id, int userProfileId);
         void InsertTag(int postId, int tagId);
         void DeleteTag(int postId, int tagId);
+        void AddPostImage(PostImage img);
+        Stream GetPostImageById(int id);
+        PostImage GetPostImageByPostId(int postId);
         public List<Tag> GetTagsByPost(int postId);
     }
 }

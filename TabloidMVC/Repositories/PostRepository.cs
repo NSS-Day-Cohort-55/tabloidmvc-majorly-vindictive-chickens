@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection.PortableExecutable;
@@ -459,6 +460,83 @@ namespace TabloidMVC.Repositories
                     reader.Close();
 
                     return tags;
+                }
+            }
+        }
+
+        public void AddPostImage(PostImage img)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        INSERT INTO PostImage ( Content, PostId )
+                        OUTPUT INSERTED.ID
+                        VALUES ( @Content, @postId )";
+
+                    cmd.Parameters.AddWithValue("@content", img.Content);
+                    cmd.Parameters.AddWithValue("@postId", img.PostId);
+
+                    img.Id = (int)cmd.ExecuteScalar();
+                }
+            }
+        }
+
+        public PostImage GetPostImageByPostId(int postId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, PostId, Content 
+                        FROM PostImage 
+                        WHERE PostId = @postId";
+                    cmd.Parameters.AddWithValue("@postId", postId);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            PostImage img = new PostImage
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                PostId = reader.GetInt32(reader.GetOrdinal("PostId"))
+                            };
+
+                            return img;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+        public Stream GetPostImageById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, PostId, Content 
+                        FROM PostImage 
+                        WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    var img = new PostImage();
+                    var reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        return reader.GetStream(reader.GetOrdinal("Content"));
+                    }
+                    return null;
                 }
             }
         }
