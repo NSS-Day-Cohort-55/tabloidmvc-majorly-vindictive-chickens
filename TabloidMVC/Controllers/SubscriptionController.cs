@@ -28,7 +28,7 @@ namespace TabloidMVC.Controllers
             return View(subscriptions);
         }
 
-        // GET: Subscription/Create/[PostId]
+        // GET: Subscription/Create/[UserProfileId from Post]
         public IActionResult Create(int id)
         {
             Subscription subscription = new Subscription
@@ -48,6 +48,45 @@ namespace TabloidMVC.Controllers
             try
             {
                 _subscriptionRepository.Add(sub);
+
+                return RedirectToAction("Index", "Post");
+            }
+            catch
+            {
+                var subscriptions = _subscriptionRepository.GetAllSubscriptions();
+                return View(subscriptions);
+            }
+        }
+
+        // GET: Subscription/Edit/[UserProfileId from Post]
+        public IActionResult Edit(int id)
+        {
+            Subscription subscription = new Subscription
+            {
+                ProviderUserProfileId = id,
+                SubscriberUserProfileId = GetCurrentUserProfileId(),
+                EndDateTime = DateTime.Now
+            };
+
+            try 
+            { 
+                return View(subscription);
+            }
+            catch
+            {
+                var subscriptions = _subscriptionRepository.GetAllSubscriptions();
+                return View(subscriptions);
+            }
+        }
+
+        // POST: Subscription/Edit/[UserProfileId from Post]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Subscription sub)
+        {
+            try
+            {
+                _subscriptionRepository.Update(sub);
 
                 return RedirectToAction("Index", "Post");
             }

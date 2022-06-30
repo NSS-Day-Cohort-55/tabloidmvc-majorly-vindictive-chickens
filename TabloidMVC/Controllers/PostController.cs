@@ -121,9 +121,13 @@ namespace TabloidMVC.Controllers
             var post = _postRepository.GetPublishedPostById(id);
             var tags = _postRepository.GetTagsByPost(id);
             var reactions = _postRepository.GetReactionsByPost(id);
+            int subscriberId = GetCurrentUserProfileId();
+            var subscription = _postRepository.GetSubscriptionByAuthorId(subscriberId, post.UserProfileId);
             vm.Tags = tags;
             vm.Post = post;
             vm.Reactions = reactions;
+            vm.Subscription = subscription;
+
             if (post == null)
             {
                 int userId = GetCurrentUserProfileId();

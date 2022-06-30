@@ -527,5 +527,43 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+        public Subscription GetSubscriptionByAuthorId(int subscriberId, int authorId)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                       SELECT s.Id, s.SubscriberUserProfileId, s.ProviderUserProfileId,
+                              s.BeginDateTime
+                         FROM Subscription s
+                        WHERE SubscriberUserProfileId = @subId and ProviderUserProfileId = @authId";
+
+                    cmd.Parameters.AddWithValue("@subId", subscriberId);
+                    cmd.Parameters.AddWithValue("@authId", authorId);
+                    var reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        Subscription subscription = new Subscription()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            SubscriberUserProfileId = reader.GetInt32(reader.GetOrdinal("SubscriberUserProfileId")),
+                            ProviderUserProfileId = reader.GetInt32(reader.GetOrdinal("ProviderUserProfileId")),
+                            BeginDateTime = reader.GetDateTime(reader.GetOrdinal("BeginDateTime"))                            
+                        };
+                        return subscription;
+                    }
+                    else 
+                    { 
+                        return null;
+                    }
+
+                }
+            }
+        }
+
     }
 }

@@ -10,6 +10,7 @@ namespace TabloidMVC.Models.ViewModels
         public List<Tag> Tags { get; set; }
         public List<int> PostReactionIds { get; set; }
         public List<Reaction> Reactions { get; set; }
+        public Subscription Subscription { get; set; }
 
     }
 }
