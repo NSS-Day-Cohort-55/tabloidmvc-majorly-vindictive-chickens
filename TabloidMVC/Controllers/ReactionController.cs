@@ -66,42 +66,54 @@ namespace TabloidMVC.Controllers
         // GET: ReactionController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Reaction reaction = _reactionRepository.GetReaction(id);
+
+            if (reaction == null)
+            {
+                return NotFound();
+            }
+
+            return View(reaction);
         }
 
         // POST: ReactionController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Reaction reaction)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _reactionRepository.UpdateReaction(reaction);
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception)
             {
-                return View();
+                return View(reaction);
             }
         }
 
         // GET: ReactionController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            Reaction reaction = _reactionRepository.GetReaction(id);
+
+            return View(reaction);
         }
 
         // POST: ReactionController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Reaction reaction)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _reactionRepository.GetReaction(id);
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(reaction);
             }
         }
     }
