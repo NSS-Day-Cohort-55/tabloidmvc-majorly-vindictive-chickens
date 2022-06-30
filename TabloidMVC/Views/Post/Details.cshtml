@@ -34,6 +34,9 @@
                 <a asp-action="CreatePostReaction" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary mx-1" title="Add Reactions">
                     <i class="fas fa-icons"></i>
                 </a>
+                <a asp-controller="Subscription" asp-action="Create" asp-route-id="@Model.Post.UserProfileId" class="btn btn-outline-primary mx-1" title="Add Subscription">
+                    <i class="fas fa-mail-bulk"></i>
+                </a>
             </div>
         </section>
         <hr />

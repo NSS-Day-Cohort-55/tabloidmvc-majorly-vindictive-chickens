@@ -59,11 +59,81 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        public IActionResult Delete(int id)
+        {
+            Comment comment = _commentRepository.GetCommentById(id);
+            if (comment.UserProfileId == GetCurrentUserProfileId())
+            {
+                return View(comment);
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Delete(int id, Comment comment)
+        {
+            try
+            {
+                _commentRepository.Delete(comment);
+
+                return RedirectToAction("Index", new {id = comment.PostId});
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Details", new { id = comment.Id });
+            }
+        }
+
+        public IActionResult Edit(int id)
+        {
+            Comment comment = _commentRepository.GetCommentById(id);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+            if(comment.UserProfileId == GetCurrentUserProfileId())
+            {
+                return View(comment);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Edit(int id, Comment comment)
+        {
+            try
+            {
+                _commentRepository.UpdateComment(comment);
+
+                return RedirectToAction("Index", "Comment", new { id = comment.PostId });
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index", "Comment", new { id = comment.PostId });
+            }
+        }
+
+
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
         }
+
+
 
     }
 }
